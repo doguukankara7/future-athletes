@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -192,8 +192,8 @@
     </nav>
     <div style="display:flex;align-items:center;gap:14px">
       <div class="lang">
-        <button data-lang="en" class="on">EN</button>
-        <button data-lang="tr">TR</button>
+        <button data-lang="en">EN</button>
+        <button data-lang="tr" class="on">TR</button>
       </div>
       <button class="theme-btn" id="themeBtn" aria-label="Toggle light/dark mode" title="Toggle theme">☾</button>
       <button class="nav-toggle" id="navToggle" aria-label="Menu">☰</button>
@@ -534,7 +534,7 @@ function applyTheme(t){
 }
 themeBtn.addEventListener("click", ()=>applyTheme(theme === "dark" ? "light" : "dark"));
 
-applyLang("en");
+applyLang("tr");
 applyTheme("dark");
 </script>
 </body>
