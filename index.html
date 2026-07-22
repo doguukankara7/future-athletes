@@ -52,7 +52,8 @@
 
   /* NAV */
   header{position:sticky;top:0;z-index:50;background:var(--header-bg);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-  .nav{display:flex;align-items:center;justify-content:space-between;height:68px}
+  header .wrap{max-width:1240px}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:68px;gap:24px}
   .brand{display:flex;align-items:center;gap:11px;font-family:'Oswald',sans-serif;font-weight:700;font-size:20px;letter-spacing:.04em;text-transform:uppercase}
   .mark{width:34px;height:34px;border:2px solid var(--gold);border-radius:50%;display:grid;place-items:center;color:var(--gold);font-size:18px;flex:none}
   .brand b{color:var(--gold)}
@@ -66,6 +67,8 @@
   .theme-btn:hover{border-color:var(--gold)}
   .ig-link{color:var(--gold)!important;font-weight:600!important}
   .ig-link:hover{color:var(--gold-bright)!important}
+  .portal-link{border:1px solid var(--gold);border-radius:999px;padding:5px 14px;font-size:13px!important;white-space:nowrap;color:var(--gold)!important;font-weight:600!important;transition:.2s}
+  .portal-link:hover{background:var(--gold);color:var(--ink)!important}
   .nav-toggle{display:none;background:none;border:none;color:var(--white);font-size:24px;cursor:pointer}
 
   /* HERO */
@@ -189,6 +192,7 @@
       <a href="#referrals" data-i18n="nav_refs">Referrals</a>
       <a href="#contact" data-i18n="nav_contact">Contact</a>
       <a href="https://www.instagram.com/futureathletesofficial/" target="_blank" rel="noopener" class="ig-link" aria-label="Instagram">Instagram ↗</a>
+      <a href="app.html" class="portal-link" data-i18n="nav_signin">Sign in</a>
     </nav>
     <div style="display:flex;align-items:center;gap:14px">
       <div class="lang">
@@ -387,7 +391,7 @@
 <script>
 const i18n = {
   en: {
-    nav_who:"Who we help", nav_coaches:"Coaches", nav_refs:"Referrals", nav_contact:"Contact",
+    nav_who:"Who we help", nav_coaches:"Coaches", nav_refs:"Referrals", nav_contact:"Contact", nav_signin:"Sign in", nav_account:"My account",
     hero_eyebrow:"Turkey ↔ USA · Basketball & Education",
     hero_title_1:"From the court", hero_title_2:"to the next level",
     hero_lede:"We connect prospects, professional players, and families to scholarships, NCAA and US high school programs, and professional basketball opportunities.",
@@ -430,7 +434,7 @@ const i18n = {
     msg_key:"Our contact form isn't live yet — please reach us by email at futureathletess@gmail.com or on Instagram @futureathletesofficial."
   },
   tr: {
-    nav_who:"Kimlere yardımcı oluyoruz", nav_coaches:"Antrenörler", nav_refs:"Referanslar", nav_contact:"İletişim",
+    nav_who:"Kimlere yardımcı oluyoruz", nav_coaches:"Antrenörler", nav_refs:"Referanslar", nav_contact:"İletişim", nav_signin:"Giriş yap", nav_account:"Hesabım",
     hero_eyebrow:"Türkiye ↔ ABD · Basketbol ve Eğitim",
     hero_title_1:"Sahadan", hero_title_2:"bir üst seviyeye",
     hero_lede:"Genç yetenekleri, profesyonel oyuncuları ve aileleri burslara, NCAA ve ABD lise programlarına ve profesyonel basketbol fırsatlarına bağlıyoruz.",
@@ -477,6 +481,7 @@ const i18n = {
 let lang = "en";
 function applyLang(l){
   lang = l;
+  try{ localStorage.setItem("fa_lang", l); }catch(e){}
   document.documentElement.lang = l;
   document.querySelectorAll("[data-i18n]").forEach(el=>{
     const k = el.getAttribute("data-i18n");
@@ -529,13 +534,36 @@ let theme = "dark";
 const themeBtn = document.getElementById("themeBtn");
 function applyTheme(t){
   theme = t;
+  try{ localStorage.setItem("fa_theme", t); }catch(e){}
   if(t === "light"){ document.documentElement.setAttribute("data-theme","light"); themeBtn.textContent = "☀"; }
   else { document.documentElement.removeAttribute("data-theme"); themeBtn.textContent = "☾"; }
 }
 themeBtn.addEventListener("click", ()=>applyTheme(theme === "dark" ? "light" : "dark"));
 
-applyLang("tr");
-applyTheme("dark");
+applyLang(localStorage.getItem("fa_lang") || "tr");
+applyTheme(localStorage.getItem("fa_theme") || "dark");
+</script>
+<script src="https://cdn.auth0.com/js/auth0-spa-js/2.1/auth0-spa-js.production.js"></script>
+<script>
+// If the user is already signed in (session cached by app.html),
+// swap the nav "Sign in" link to "My account".
+(async ()=>{
+  try{
+    if(typeof auth0 === "undefined") return;
+    const client = await auth0.createAuth0Client({
+      domain: "dev-h3yd50721ta73elu.us.auth0.com",
+      clientId: "ViUWs23NF2OfHEeWcQEn5CDojMml9R8A",
+      cacheLocation: "localstorage"
+    });
+    if(await client.isAuthenticated()){
+      const link = document.querySelector(".portal-link");
+      if(link){
+        link.setAttribute("data-i18n","nav_account");
+        link.innerHTML = i18n[lang].nav_account;
+      }
+    }
+  }catch(e){ /* not signed in or SDK failed — keep "Sign in" */ }
+})();
 </script>
 </body>
 </html>
